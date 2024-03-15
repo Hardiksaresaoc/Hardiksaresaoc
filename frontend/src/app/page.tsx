@@ -1,5 +1,0 @@
-import Homefunction from "./home/page";
-
-export default function Home() {
-  return <Homefunction />;
-}

@@ -5,24 +5,28 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalGuards(new JwtAuthGuard())
-  app.enableCors();
+  app.useGlobalGuards(new JwtAuthGuard());
+  app.enableCors({ origin: 'http://locahost:3000/' });
 
   const options = new DocumentBuilder()
-  .setTitle("NGO Website")
-  .setDescription("Ngo Website Nest Rest Api Documentation")
-  .setVersion("1.0")
-  .addBearerAuth({
-     type: "http",
-     scheme: "bearer",
-     bearerFormat: "JWT",
-     name : "JWT",
-     description: "Enter your JWT token",
-     in: "header"
-  }, "JWT-auth").build();
+    .setTitle('NGO Website')
+    .setDescription('Ngo Website Nest Rest Api Documentation')
+    .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter your JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .build();
 
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
-  await app.listen(3000);
+  await app.listen(5000);
 }
 bootstrap();
