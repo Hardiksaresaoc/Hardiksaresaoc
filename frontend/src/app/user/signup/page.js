@@ -1,4 +1,5 @@
 "use client";
+import { data } from "autoprefixer";
 import axios from "axios";
 import { useState } from "react";
 
@@ -16,13 +17,28 @@ export default function page() {
           "Content-type": "application/json",
         },
       };
-      const data = await axios.post(
-        "http://locahost:5000/user/signup",
-        { firstname, lastname, email, password },
+      const data = JSON.stringify( {
+        
+          "firstName":firstname,
+          "lastName":lastname,
+          "password":password,
+          "email":email
+      }      );
+
+      const response = await axios.post(
+        "http://localhost:3001/user/signUp",
+        data,
         config
       );
-      console.log(data);
+
+      // const data = await axios.post(
+      //   "http://localhost:3001/user/signUp",
+      //   { firstname, lastname, email, password },
+      //   config
+      // );
+      console.log("Successful submission:", response.data); // Assuming the server response contains data
     } catch (error) {
+      console.log("strt"+data+"end")
       console.log(error);
     }
   };
