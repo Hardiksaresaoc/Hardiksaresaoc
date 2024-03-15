@@ -4,6 +4,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repo/user.repository';
 import { User } from './entities/user.entity';
 import { Constants } from 'src/utils/constants';
+import * as bcrypt from 'bcrypt';
+import { use } from 'passport';
 
 @Injectable()
 export class UserService {
@@ -11,13 +13,15 @@ export class UserService {
   constructor(private userRepository: UserRepository){}
 
 
-  create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(createUserDto.password,10)
     let user: User = new User();
     user.email = createUserDto.email;
     user.firstName = createUserDto.firstName;
     user.lastName = createUserDto.lastName;
-    user.password = createUserDto.password;
+    user.password = hashedPassword;
     user.role = Constants.ROLES.NORMAL_ROLE;
+    // user.createdAt = DateTime
     return this.userRepository.save(user);
   }
 

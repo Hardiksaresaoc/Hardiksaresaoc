@@ -1,15 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  ValidationPipe,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, Req, UseGuards, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,20 +7,28 @@ import { Constants } from 'src/utils/constants';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
-@ApiTags('User')
+@ApiTags("User")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('/signUp')
-  create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
-    console.log("signUP")
+
+  //signUp Route
+  @Post("/signUp")
+  async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
+    const existingUser = await this.userService.findUserByEmail(createUserDto.email);
+    if(existingUser){
+      throw new BadRequestException("Email already in use")
+    }
+    else{
     return this.userService.create(createUserDto);
+    }
   }
 
+  //Get-all user route NOTE:Only admin-access route
   @Get()
-  @ApiSecurity('JWT-auth')
+  @ApiSecurity("JWT-auth")
   @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
-  findAll(@Req() req) {
+  findAll(@Req()req) {
     return this.userService.findAll();
   }
 
@@ -45,10 +42,11 @@ export class UserController {
   //   return this.userService.update(+id, updateUserDto);
   // }
 
+  // Delete user route by id
   @Delete(':id')
-  @ApiSecurity('JWT-auth')
+  @ApiSecurity("JWT-auth")
   @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
-  remove(@Param('id') id: string, @Req() req) {
+  remove(@Param('id') id: string,@Req() req) {
     return this.userService.remove(+id);
   }
 }

@@ -1,4 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Field } from "@nestjs/graphql";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -9,7 +10,9 @@ export class User {
     @Column()
     firstName: string;
 
-    @Column({nullable:true})
+    @Column({
+        nullable: true
+    })
     lastName: string;
 
     @Column()
@@ -20,5 +23,11 @@ export class User {
 
     @Column()
     role: string;
+    
+    @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
+    public created_at: Date;
+
+    @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
+    public updated_at: Date;
 
 }
