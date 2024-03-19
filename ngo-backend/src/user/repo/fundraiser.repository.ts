@@ -4,7 +4,7 @@ import { Fundraiser } from "../entities/fundraiser.entity";
 
 
 @Injectable()
-export class UserRepository extends Repository<Fundraiser>{
+export class FundRaiserRepository extends Repository<Fundraiser>{
     constructor(private dataSource: DataSource){
         super(Fundraiser,dataSource.createEntityManager());
     }
