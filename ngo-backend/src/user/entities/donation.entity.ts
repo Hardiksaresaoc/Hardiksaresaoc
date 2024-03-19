@@ -1,5 +1,6 @@
 import { Field } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Fundraiser } from "./fundraiser.entity";
 
 @Entity()
 export class Donation {
@@ -7,8 +8,8 @@ export class Donation {
     @PrimaryGeneratedColumn()
     donation_id: number;
 
-    @Column()
-    fundraiser_id: number;
+    @OneToOne(()=> Fundraiser,(id)=>{id.fundraiser_id})
+    fundraiser_id: Fundraiser;
 
     @Column()
     user_id: number;

@@ -5,12 +5,14 @@ import { ApiTags } from "@nestjs/swagger";
 import { User } from "src/user/entities/user.entity";
 import { LoginDto } from "./dto/login.dto";
 import * as bcrypt from "bcrypt"
+import { UserService } from "src/user/user.service";
 
 @Controller("auth")
 @ApiTags("Login")
 export class AuthController {
 
-    constructor(private jwtService: JwtService){}
+    constructor(private jwtService: JwtService,
+        private userService: UserService){}
 
     //Login Route
     @Post("/login")
@@ -31,6 +33,13 @@ export class AuthController {
         else{
             return null;
         }
+    }
+
+    @Post("/generate")
+    generatePasswordByEmail(@Body() body){
+        var randomstring = Math.random().toString(36).slice(-8);
+        console.log(randomstring);
+        return this.userService.createdByAdmin(body, randomstring)
     }
 
 }

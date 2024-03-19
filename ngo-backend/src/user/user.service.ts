@@ -25,6 +25,19 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
+  async createdByAdmin(createUserDto:any, password:string){
+    const hashedPassword = await bcrypt.hash(password,10)
+    let user: User = new User();
+    user.email = createUserDto.email;
+    user.firstName = createUserDto.firstName;
+    user.lastName = createUserDto.lastName;
+    user.password = hashedPassword;
+    user.role = Constants.ROLES.NORMAL_ROLE;
+    // user.createdAt = DateTime
+    return this.userRepository.save(user);
+  }
+
+
   findAll() {
     return this.userRepository.find()
   }

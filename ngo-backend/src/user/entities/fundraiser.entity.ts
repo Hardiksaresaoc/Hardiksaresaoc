@@ -1,10 +1,12 @@
 import { Field } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Donation } from "./donation.entity";
 
 @Entity()
 export class Fundraiser {
 
     @PrimaryGeneratedColumn()
+    @OneToOne(()=> Donation,(id)=>{id.fundraiser_id})
     fundraiser_id: number;
 
     @Column()
