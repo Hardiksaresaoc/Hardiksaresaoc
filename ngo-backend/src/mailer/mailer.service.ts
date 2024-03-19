@@ -22,6 +22,8 @@ export class MailerService {
     return transporter;
   }
 
+  //template function is for sending custom html in email
+
   template( html:string, replacements: Record<string, string>){
     return html.replace(
         /{(\w*)}/g,
@@ -30,6 +32,8 @@ export class MailerService {
         }
       );
 }
+
+
   async sendMail(dto:sendEmailDto){
     const {from,recipients,subject } = dto;
     const html = dto.placeholderReplacements

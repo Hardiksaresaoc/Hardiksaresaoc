@@ -6,14 +6,13 @@ import { User } from './entities/user.entity';
 import { Constants } from 'src/utils/constants';
 import * as bcrypt from 'bcrypt';
 import { use } from 'passport';
-import { FundRaiserRepository } from './repo/fundraiser.repository';
-import { Fundraiser } from './entities/fundraiser.entity';
+import { FundRaiserRepository } from '../fundraiser/repo/fundraiser.repository';
+import { Fundraiser } from '../fundraiser/entities/fundraiser.entity';
 
 @Injectable()
 export class UserService {
 
-  constructor(private userRepository: UserRepository,
-    private fundraiserRepository:FundRaiserRepository){}
+  constructor(private userRepository: UserRepository){}
 
 
   async create(createUserDto: CreateUserDto) {
@@ -28,17 +27,17 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async createdByAdmin(createUserDto:any, password:string){
-    const hashedPassword = await bcrypt.hash(password,10)
-    let user: Fundraiser = new Fundraiser();
-    user.email = createUserDto.email;
-    user.firstName = createUserDto.firstName;
-    user.lastName = createUserDto.lastName;
-    user.password = hashedPassword;
-    user.role = Constants.ROLES.FUNDRAISER_ROLE;
-    user.status = "active";
-    return this.fundraiserRepository.save(user);
-  }
+  // async createdByAdmin(createUserDto:any, password:string){
+  //   const hashedPassword = await bcrypt.hash(password,10)
+  //   let user: Fundraiser = new Fundraiser();
+  //   user.email = createUserDto.email;
+  //   user.firstName = createUserDto.firstName;
+  //   user.lastName = createUserDto.lastName;
+  //   user.password = hashedPassword;
+  //   user.role = Constants.ROLES.FUNDRAISER_ROLE;
+  //   user.status = "active";
+  //   return this.fundraiserRepository.save(user);
+  // }
 
 
   findAll() {

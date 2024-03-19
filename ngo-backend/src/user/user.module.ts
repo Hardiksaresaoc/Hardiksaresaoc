@@ -4,13 +4,13 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UserRepository } from './repo/user.repository';
-import { Fundraiser } from './entities/fundraiser.entity';
-import { FundRaiserRepository } from './repo/fundraiser.repository';
+import { Fundraiser } from '../fundraiser/entities/fundraiser.entity';
+import { FundRaiserRepository } from '../fundraiser/repo/fundraiser.repository';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([User,Fundraiser])],
+  imports:[TypeOrmModule.forFeature([User])],
   controllers: [UserController],
-  providers: [UserService,UserRepository,FundRaiserRepository],
+  providers: [UserService,UserRepository],
   exports:[UserService]
 })
 export class UserModule {}

@@ -8,6 +8,7 @@ import * as bcrypt from "bcrypt"
 import { UserService } from "src/user/user.service";
 import { sendEmailDto } from "src/mailer/mail.interface";
 import { MailerService } from "src/mailer/mailer.service";
+import { AdminService } from "src/admin/admin.service";
 
 @Controller("auth")
 @ApiTags("Login")
@@ -15,7 +16,8 @@ export class AuthController {
 
     constructor(private jwtService: JwtService,
         private userService: UserService,
-        private mailerService:MailerService){}
+        private mailerService:MailerService,
+        private adminService:AdminService){}
 
     //Login Route
     @Post("/login")
@@ -56,7 +58,7 @@ export class AuthController {
           };
           await this.mailerService.sendMail(dto);
             
-        return this.userService.createdByAdmin(body, randomstring)
+        return this.adminService.createdByAdmin(body, randomstring)
     }
 
 }

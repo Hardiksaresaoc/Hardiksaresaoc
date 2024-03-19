@@ -4,6 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from './mailer/mailer.module';
+import { FundraiserModule } from './fundraiser/fundraiser.module';
+import { DonationModule } from './donation/donation.module';
+import { ProjectModule } from './project/project.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -26,7 +30,11 @@ import { MailerModule } from './mailer/mailer.module';
   }),
   UserModule,
   AuthModule,
-  MailerModule
+  MailerModule,
+  FundraiserModule,
+  ProjectModule,
+  DonationModule,
+  AdminModule
   ],
     
   controllers: [],
