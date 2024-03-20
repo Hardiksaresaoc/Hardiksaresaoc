@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Body, Injectable, Req } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repo/user.repository';
@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { use } from 'passport';
 import { FundRaiserRepository } from '../fundraiser/repo/fundraiser.repository';
 import { Fundraiser } from '../fundraiser/entities/fundraiser.entity';
+import { ChangePasswordDto } from '../fundraiser/dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -64,5 +65,6 @@ export class UserService {
   remove(id: number) {
     return this.userRepository.delete(id);
   }
+
 
 }

@@ -5,6 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RoleGuard } from 'src/auth/guard/role.guard';
 import { Constants } from 'src/utils/constants';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ChangePasswordDto } from '../fundraiser/dto/change-password.dto';
 
 @Controller('user')
 @ApiTags("User")
@@ -49,4 +50,5 @@ export class UserController {
   remove(@Param('id') id: string,@Req() req) {
     return this.userService.remove(+id);
   }
+
 }

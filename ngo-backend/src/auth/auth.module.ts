@@ -9,9 +9,10 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 import { MailerService } from 'src/mailer/mailer.service';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { AdminModule } from 'src/admin/admin.module';
+import { FundraiserModule } from 'src/fundraiser/fundraiser.module';
 
 @Module({
-  imports:[AdminModule,MailerModule,PassportModule,UserModule,JwtModule.registerAsync({
+  imports:[FundraiserModule,AdminModule,MailerModule,PassportModule,UserModule,JwtModule.registerAsync({
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService) => ({
       secret: configService.get('JWT_SECRET'),
