@@ -10,9 +10,10 @@ import { MailerService } from 'src/mailer/mailer.service';
 import { MailerModule } from 'src/mailer/mailer.module';
 import { AdminModule } from 'src/admin/admin.module';
 import { FundraiserModule } from 'src/fundraiser/fundraiser.module';
+import { AuthService } from './auth.service';
 
 @Module({
-  imports:[FundraiserModule,AdminModule,MailerModule,PassportModule,UserModule,JwtModule.registerAsync({
+  imports:[FundraiserModule,AdminModule,MailerModule,PassportModule.register({session:true}),UserModule,JwtModule.registerAsync({
     imports: [ConfigModule],
     useFactory: async (configService: ConfigService) => ({
       secret: configService.get('JWT_SECRET'),
@@ -21,6 +22,6 @@ import { FundraiserModule } from 'src/fundraiser/fundraiser.module';
     inject: [ConfigService],
   })],
   controllers: [AuthController],
-  providers: [LocalStrategy, JwtStrategy],
+  providers: [LocalStrategy, JwtStrategy, AuthService],
 })
 export class AuthModule {}

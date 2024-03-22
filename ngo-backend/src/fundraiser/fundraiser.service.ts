@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { FundRaiserRepository } from './repo/fundraiser.repository';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { Fundraiser } from './entities/fundraiser.entity';
@@ -24,12 +24,23 @@ export class FundraiserService {
         const user:User = req.user;
         const user2 = await this.userRepository.findOne({where:{email:user.email}})
         var isSame = await bcrypt.compare(changePasswordDto.oldPassword,user2.password)
-        console.log(changePasswordDto.newPassword==changePasswordDto.confirmPassword)
-        if(isSame && changePasswordDto.newPassword == changePasswordDto.confirmPassword){
-          const hashedPassword = await bcrypt.hash(changePasswordDto.newPassword,10)
-          return this.userRepository.update(user2.id,{password:hashedPassword});
-        }
+        if(isSame){
+          if(changePasswordDto.newPassword==changePasswordDto.confirmPassword){
+            const hashedPassword = await bcrypt.hash(changePasswordDto.newPassword,10)
+            return this.userRepository.update(user2.id,{password:hashedPassword});
+          }
+          else{
+            throw new UnauthorizedException("New password and confirm password do not match")
+          }
+      }else{
+        throw new UnauthorizedException("Old password is incorrect")
       }
+      }
+
+    // async updateFundRaiserById(req){
+    //   const user:User = req.user;
+
+    // }  
     
     
 }

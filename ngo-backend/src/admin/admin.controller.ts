@@ -1,11 +1,17 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { sendEmailDto } from 'src/mailer/mail.interface';
+import { MailerService } from 'src/mailer/mailer.service';
+import { UserRepository } from 'src/user/repo/user.repository';
 
 @ApiTags("Admin")
 @Controller('admin')
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService,
+    private mailerService:MailerService,
+    private userRepository:UserRepository
+    ) {}
 
   @ApiSecurity("JWT-auth")
   @Post("/fundraiser/status/:id")
@@ -14,7 +20,7 @@ export class AdminController {
   }
 
   @ApiSecurity("JWT-auth")
-  @Post("/fundraiser/delete/:id")
+  @Delete("/fundraiser/delete/:id")
   deleteFundraiser(@Param('id') id: number) {
     return this.adminService.deleteFundraiser(id);
   }
@@ -24,4 +30,41 @@ export class AdminController {
   getAllFundraiser() {
     return this.adminService.getAllFundraiser();
   }
+
+  @ApiSecurity("JWT-auth")
+  @Post("/generate")
+ async generatePasswordByEmail(@Body() body){
+  const isUserExists = await this.userRepository.findOne({where:{email: body.email}})
+  if(isUserExists && isUserExists.role == "FUNDRAISER"){
+    throw new BadRequestException("Email already in use")
+  }    
+else{
+
+      var randomstring = Math.random().toString(36).slice(-8);
+      // console.log(randomstring);
+      // console.log(body.email)
+      var body2 = {
+          "firstName":body.firstName,
+          "password":randomstring
+      }
+      const dto:sendEmailDto = {
+          // from: {name:"Lucy", address:"lucy@example.com"},
+          recipients: [{name: body.firstName, address:body.email}],
+          subject: "FundRaiser Password",
+          html: "<p>Hi {firstName}, Login to Portal using:{password} </p><p><strong>Cheers!</strong></p>",
+          placeholderReplacements:body2
+        };
+        await this.mailerService.sendMail(dto);
+          
+      return this.adminService.createdByAdmin(body, randomstring)
+}
+  }
+
+  @ApiSecurity("JWT-auth")
+  @Delete("/user/delete/:id")
+  deleteUser(@Param('id') id: number) {
+    return this.adminService.deleteUser(id);
+  }
+
+
 }

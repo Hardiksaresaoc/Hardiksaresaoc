@@ -17,7 +17,6 @@ export class AuthController {
 
     constructor(private jwtService: JwtService,
         private userService: UserService,
-        private mailerService:MailerService,
         private adminService:AdminService,
         private fundRaiserService:FundraiserService){}
 
@@ -49,26 +48,6 @@ export class AuthController {
     } 
     }
 
-    @ApiSecurity("JWT-auth")
-    @Post("/generate")
-   async generatePasswordByEmail(@Body() body){
-        var randomstring = Math.random().toString(36).slice(-8);
-        // console.log(randomstring);
-        // console.log(body.email)
-        var body2 = {
-            "firstName":body.firstName,
-            "password":randomstring
-        }
-        const dto:sendEmailDto = {
-            // from: {name:"Lucy", address:"lucy@example.com"},
-            recipients: [{name: body.firstName, address:body.email}],
-            subject: "FundRaiser Password",
-            html: "<p>Hi {firstName}, Login to Portal using:{password} </p><p><strong>Cheers!</strong></p>",
-            placeholderReplacements:body2
-          };
-          await this.mailerService.sendMail(dto);
-            
-        return this.adminService.createdByAdmin(body, randomstring)
-    }
+    
 
 }

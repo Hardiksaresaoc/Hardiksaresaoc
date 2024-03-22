@@ -1,4 +1,4 @@
-import { Body, Injectable, Req } from '@nestjs/common';
+import { BadRequestException, Body, Injectable, Req } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repo/user.repository';
@@ -27,20 +27,8 @@ export class UserService {
     // user.createdAt = DateTime
     return this.userRepository.save(user);
   }
-
-  // async createdByAdmin(createUserDto:any, password:string){
-  //   const hashedPassword = await bcrypt.hash(password,10)
-  //   let user: Fundraiser = new Fundraiser();
-  //   user.email = createUserDto.email;
-  //   user.firstName = createUserDto.firstName;
-  //   user.lastName = createUserDto.lastName;
-  //   user.password = hashedPassword;
-  //   user.role = Constants.ROLES.FUNDRAISER_ROLE;
-  //   user.status = "active";
-  //   return this.fundraiserRepository.save(user);
-  // }
-
-
+  
+  
   findAll() {
     return this.userRepository.find()
   }

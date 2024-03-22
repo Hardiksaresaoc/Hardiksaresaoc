@@ -10,19 +10,19 @@ async function bootstrap() {
   const corsOpts = {
     origin: 'http://localhost:3000',
     credentials: true,
-  
-
-
     methods: [
       "GET",
       "POST",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
     ],
-
     allowedHeaders: [
       // "Origin",
-      // "X-Requested-With",
+      "X-Requested-With",
       "Content-Type",
-      // "Accept",
+      "Accept",
+      "Authorization",
     ]
   }
   app.use(cors(corsOpts))
