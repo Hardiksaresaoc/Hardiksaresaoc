@@ -7,6 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { FundRaiserRepository } from './repo/fundraiser.repository';
 
+@UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
 @ApiTags("FundRaiser")
 @Controller('fundRaiser')
 export class FundraiserController {
@@ -15,7 +16,6 @@ export class FundraiserController {
 
   @ApiSecurity("JWT-auth")
   @Post("/changePassword")
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
   async changePassword(@Req() req,@Body() changePasswordDto:ChangePasswordDto){
     await this.fundraiserService.changePassword(req,changePasswordDto)
     return "Password Changed Successfully";
@@ -24,7 +24,6 @@ export class FundraiserController {
   
   @Get()
   @ApiSecurity("JWT-auth")
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
   async getFundraiserById(@Req() req){
     const id = req.user;
     try {

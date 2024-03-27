@@ -1,5 +1,6 @@
 import { Field } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Fundraiser } from "src/fundraiser/entities/fundraiser.entity";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Project {
@@ -7,7 +8,7 @@ export class Project {
     @PrimaryGeneratedColumn()
     project_id: number;
 
-    @Column()
+    @Column({unique:true})
     project_name: string;
 
     @Column()
@@ -24,6 +25,9 @@ export class Project {
 
     @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
     public updated_at: Date;
+
+    @ManyToOne(()=>Fundraiser,fundraiser=>fundraiser.project,{onDelete:"SET NULL"})
+    fundraiser:Fundraiser;
 
 
 }

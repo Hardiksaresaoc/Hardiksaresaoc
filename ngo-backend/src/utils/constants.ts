@@ -4,5 +4,5 @@ export const Constants = {
         NORMAL_ROLE: 'NORMAL_USER_ROLE',
         FUNDRAISER_ROLE: 'FUNDRAISER'
     },
-    BY_PASS_URLS : ["/auth/login", "/user/signUp"]
+    BY_PASS_URLS : ["/auth/login", "/user/signUp","/auth/reset-password","/auth/forgot-password"]
 }

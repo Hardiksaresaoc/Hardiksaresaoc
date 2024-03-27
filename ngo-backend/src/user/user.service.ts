@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Injectable, Req } from '@nestjs/common';
+import { BadRequestException, Body, Injectable, NotFoundException, Req } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserRepository } from './repo/user.repository';
@@ -50,7 +50,13 @@ export class UserService {
   }
 
 
-  remove(id: number) {
+  async remove(id: number) {
+    const user = await this.userRepository.findOne({where:{id:id}});
+
+    if (!user) {
+      throw new NotFoundException('Fundraiser not found');
+    }
+
     return this.userRepository.delete(id);
   }
 

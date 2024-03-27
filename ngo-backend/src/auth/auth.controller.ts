@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, UseGuards ,Param, NotFoundException} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiSecurity, ApiTags } from "@nestjs/swagger";
@@ -10,6 +10,9 @@ import { sendEmailDto } from "src/mailer/mail.interface";
 import { MailerService } from "src/mailer/mailer.service";
 import { AdminService } from "src/admin/admin.service";
 import { FundraiserService } from "src/fundraiser/fundraiser.service";
+import { AuthService} from "src/auth/auth.service"
+import { ForgottenPasswordRepository } from "./repo/forgot-password.repo";
+import { UserRepository } from "src/user/repo/user.repository";
 
 @Controller("auth")
 @ApiTags("Login")
@@ -18,7 +21,11 @@ export class AuthController {
     constructor(private jwtService: JwtService,
         private userService: UserService,
         private adminService:AdminService,
-        private fundRaiserService:FundraiserService){}
+        private fundRaiserService:FundraiserService,
+        private authService:AuthService,
+        private forgottenPasswordRepository:ForgottenPasswordRepository,
+        private userRepository:UserRepository
+        ){}
 
     //Login Route
     @Post("/login")
@@ -29,7 +36,7 @@ export class AuthController {
         if((user.role=="FUNDRAISER" && await this.fundRaiserService.getFundRaiserStatusByEmail(user.email)=="active" ) ||(user.role=="NORMAL_USER_ROLE") || (user.role=="ADMIN")){
             
         
-        if(user && (bcrypt.compare(loginDto.password,user.password))){
+        if(user && (await bcrypt.compare(loginDto.password,user.password))){
             const payload = {
                 "firstName": user.firstName,
                 "lastName": user.lastName,
@@ -48,6 +55,30 @@ export class AuthController {
     } 
     }
 
+    @Get("forgot-password")
+    public async sendEmailForgotPassword(@Body("email") email:string){
+        return await this.authService.sendEmailForgotPassword(email);
+    }
+
+    @Post("reset-password")
+    async setNewPassword(@Body()body){
+        var user = await this.forgottenPasswordRepository.findOne({where:{newPasswordToken:body.otp}})
+        if(!user){
+            throw new NotFoundException("Invalid Otp")
+        }
+        else{
+            var user_new = await this.userService.findUserByEmail(user.email)
+            const password = body.newPassword
+            const hashedPassword = await bcrypt.hash(password,10)
+            var status = await this.userRepository.update(user_new.id,{password:hashedPassword})
+            if(status){
+            await this.forgottenPasswordRepository.remove(user)}
+            return "Success"
+
+        }
+        
+
+        }
     
 
 }

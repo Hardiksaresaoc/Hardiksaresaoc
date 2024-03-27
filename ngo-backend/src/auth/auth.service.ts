@@ -1,79 +1,58 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request, Response } from 'express';
+import { Request, Response, response } from 'express';
+import { sendEmailDto } from 'src/mailer/mail.interface';
+import { MailerService } from 'src/mailer/mailer.service';
 import { User } from 'src/user/entities/user.entity';
 import { UserRepository } from 'src/user/repo/user.repository';
+import { UserService } from 'src/user/user.service';
+import { ForgottenPasswordRepository } from './repo/forgot-password.repo';
+import { ForgottenPassword } from './entities/forgot-password.entity';
 
 @Injectable()
 export class AuthService {
 
     constructor(
-        private jwtService: JwtService,
-        private userRepository: UserRepository
+        private userService: UserService,
+        private mailerService: MailerService,
+        private forgottenPasswordRepository:ForgottenPasswordRepository
     ){}
 
-    async refreshToken(req: Request,res:Response):Promise<string>{
-        const refreshToken = req.cookies["refresh_token"];
-        if(!refreshToken){
-            throw new UnauthorizedException("Refresh token not found");
+    async sendEmailForgotPassword(email:string){
+        const user = await this.userService.findUserByEmail(email)
+        if(!user){
+            throw new NotFoundException("User not found")
         }
-        let payload;
-        try {
-            payload = this.jwtService.verify(refreshToken, {
-                secret: "secret"
-            })
+
+        var randomstring = Math.random().toString(36).slice(-8);
+        var body2 = {
+            "firstName":user.firstName,
+            "otp":randomstring
+        }
+        const dto:sendEmailDto = {
+            recipients: [{name: user.firstName, address:user.email}],
+            subject: "Reset Password",
+            html: "<p>Hi {firstName}, Reset password using:{otp} </p><p>Otp expires in<strong>10</strong>minutes</p>",
+            placeholderReplacements:body2
+          };
+          await this.mailerService.sendMail(dto);
+  
+        let forgotPassword = new ForgottenPassword()
+        forgotPassword.email = email
+        forgotPassword.newPasswordToken = randomstring
+        await this.forgottenPasswordRepository.save(forgotPassword)  
+        setTimeout(async ()=>{
+            try{
+            var user2 = await this.forgottenPasswordRepository.findOne({where:{email:email}})
+            await this.forgottenPasswordRepository.remove(user2)
             
-        } catch (error) {
-            throw new UnauthorizedException("Invalid or expired refresh token")
-        }
-
-        const userExists = await this.userRepository.findOne({where:{id:payload.sub}});
-        console.log("hello")
-        if(!userExists){
-            throw new BadRequestException("User no longer exists")
-        }
-        const expiresIn = 15000;
-        const expiration = Math.floor(Date.now() / 1000) + expiresIn;
-        const accessToken = this.jwtService.sign(
-            {...payload, exp:expiration},
-            {
-                secret:"access_token_Secret",
-            }
-        )
-        res.cookie("access_token", accessToken, {
-            httpOnly: true
-        })
-
-        return accessToken;
+            }catch{
+                return true
+            }},600000)   
+                 return "true"
     }
-
-    issueTokens(user:User, response:Response){
-        const payload = {email:user.email, sub:user.id}
-
-        const accessToken = this.jwtService.sign(
-            {...payload,},
-            {
-                secret:"access_token_Secret",
-                expiresIn:"150sec"
-            }
-        )
-
-        const refreshToken = this.jwtService.sign(payload,{
-            secret:"refresh_token_Secret",
-            expiresIn:"7d"
-        });
-
-        console.log(refreshToken)
-        response.cookie("access_token", accessToken, {
-            httpOnly: true
-        })
-        console.log(refreshToken)
-
-        response.cookie("refresh_token", refreshToken, {
-            httpOnly: true
-        })
-        return {user};
-    }
-
-
+    
+       
+       
+     
 }

@@ -8,6 +8,7 @@ import { FundraiserModule } from './fundraiser/fundraiser.module';
 import { DonationModule } from './donation/donation.module';
 import { ProjectModule } from './project/project.module';
 import { AdminModule } from './admin/admin.module';
+import { FundraiserPageModule } from './fundraiser-page/fundraiser-page.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { AdminModule } from './admin/admin.module';
   FundraiserModule,
   ProjectModule,
   DonationModule,
-  AdminModule
+  AdminModule,
+  FundraiserPageModule
   ],
     
   controllers: [],

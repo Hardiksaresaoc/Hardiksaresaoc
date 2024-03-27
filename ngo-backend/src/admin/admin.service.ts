@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Fundraiser } from 'src/fundraiser/entities/fundraiser.entity';
 import { FundraiserService } from 'src/fundraiser/fundraiser.service';
 import * as bcrypt from 'bcrypt';
@@ -45,7 +45,7 @@ export class AdminService {
         const fundraiser = await this.fundraiserRepository.findOne({where:{fundraiser_id:id}});
 
         if (!fundraiser) {
-          throw new Error('Fundraiser not found');
+          throw new NotFoundException('Fundraiser not found');
         }
       
         // Toggle the status based on its current value
@@ -59,6 +59,12 @@ export class AdminService {
     }  
     
     async deleteFundraiser(id:number){
+        const fundraiser = await this.fundraiserRepository.findOne({where:{fundraiser_id:id}});
+
+        if (!fundraiser) {
+          throw new NotFoundException('Fundraiser not found');
+        }
+
         return await this.fundraiserRepository.delete(id);
     }
 

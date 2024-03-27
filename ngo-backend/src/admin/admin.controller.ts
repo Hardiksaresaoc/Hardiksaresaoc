@@ -1,16 +1,21 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { sendEmailDto } from 'src/mailer/mail.interface';
 import { MailerService } from 'src/mailer/mailer.service';
 import { UserRepository } from 'src/user/repo/user.repository';
+import { RoleGuard } from 'src/auth/guard/role.guard';
+import { Constants } from 'src/utils/constants';
+import { ProjectService } from 'src/project/project.service';
 
+@UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
 @ApiTags("Admin")
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService,
     private mailerService:MailerService,
-    private userRepository:UserRepository
+    private userRepository:UserRepository,
+    private projectService:ProjectService
     ) {}
 
   @ApiSecurity("JWT-auth")
@@ -21,7 +26,7 @@ export class AdminController {
 
   @ApiSecurity("JWT-auth")
   @Delete("/fundraiser/delete/:id")
-  deleteFundraiser(@Param('id') id: number) {
+  deleteFundraiser(@Param('id',ParseIntPipe) id: number) {
     return this.adminService.deleteFundraiser(id);
   }
 
@@ -62,9 +67,20 @@ else{
 
   @ApiSecurity("JWT-auth")
   @Delete("/user/delete/:id")
-  deleteUser(@Param('id') id: number) {
+  deleteUser(@Param('id',ParseIntPipe) id: number) {
     return this.adminService.deleteUser(id);
   }
+
+  @Get("projects")
+  getProjects(){
+    return this.projectService.getProjects();
+  }
+
+  @Get("project/:id")
+  async getProjectById(@Param("id") project_id:number){
+    return await this.projectService.getProjectById(project_id)
+  }
+
 
 
 }
