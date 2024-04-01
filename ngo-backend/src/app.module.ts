@@ -36,7 +36,7 @@ import { FundraiserPageModule } from './fundraiser-page/fundraiser-page.module';
   ProjectModule,
   DonationModule,
   AdminModule,
-  FundraiserPageModule
+  FundraiserPageModule,
   ],
     
   controllers: [],

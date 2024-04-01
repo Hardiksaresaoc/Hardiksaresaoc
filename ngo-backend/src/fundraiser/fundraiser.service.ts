@@ -5,6 +5,7 @@ import { Fundraiser } from './entities/fundraiser.entity';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/repo/user.repository';
 import { User } from 'src/user/entities/user.entity';
+import { UpdateFundraiserDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class FundraiserService {
@@ -37,10 +38,27 @@ export class FundraiserService {
       }
       }
 
-    // async updateFundRaiserById(req){
-    //   const user:User = req.user;
+    async updateFundRaiserById(req,updateFundRaiserDto:UpdateFundraiserDto){
+      const user:User = req.user;
+      console.log(updateFundRaiserDto)
+      const fundRaiser = await this.fundRaiserRepository.findOne({where:{fundraiser_id:req.id}})
+      const updatedFund = await this.fundRaiserRepository.update(fundRaiser.fundraiser_id,updateFundRaiserDto  
+        // firstName:fundraiser.firstName,
+        // lastName:fundraiser.lastName,
+        // mobile_number:fundraiser.mobile_number,
+        // profilePicture:fundraiser.profilePicture,
+        // address:fundraiser.address,
+        // city:fundraiser.city,
+        // state:fundraiser.state,
+        // country:fundraiser.country,
+        // pincode:fundraiser.pincode,
+        // dob:fundraiser.dob,
+        // pan:fundraiser.pan,
+      )
 
-    // }  
+      // console.log(updatedFund)
+
+    }  
     
     
 }

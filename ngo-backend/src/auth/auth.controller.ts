@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, UseGuards ,Param, NotFoundException} from "@nestjs/common";
+import { Body, Controller, Get, Post, Req, UseGuards ,Param, NotFoundException, Res} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { AuthGuard } from "@nestjs/passport";
 import { ApiSecurity, ApiTags } from "@nestjs/swagger";
@@ -13,6 +13,7 @@ import { FundraiserService } from "src/fundraiser/fundraiser.service";
 import { AuthService} from "src/auth/auth.service"
 import { ForgottenPasswordRepository } from "./repo/forgot-password.repo";
 import { UserRepository } from "src/user/repo/user.repository";
+import { response } from "express";
 
 @Controller("auth")
 @ApiTags("Login")
@@ -30,7 +31,7 @@ export class AuthController {
     //Login Route
     @Post("/login")
     @UseGuards(AuthGuard("local"))
-    async login(@Req() req, @Body() loginDto: LoginDto){
+    async login(@Req() req, @Body() loginDto: LoginDto,@Res({passthrough:true}) response){
         //jwt token
         const user : User = req.user;
         if((user.role=="FUNDRAISER" && await this.fundRaiserService.getFundRaiserStatusByEmail(user.email)=="active" ) ||(user.role=="NORMAL_USER_ROLE") || (user.role=="ADMIN")){
@@ -44,7 +45,9 @@ export class AuthController {
                 "role": user.role,
                 "userId": user.id   
             }
-            return {token: this.jwtService.sign(payload)};    
+            return {token: this.jwtService.sign(payload)};   
+            // return this.authService.issueTokens(user, response); // Issue tokens on login
+ 
         }
         else{
             return null;

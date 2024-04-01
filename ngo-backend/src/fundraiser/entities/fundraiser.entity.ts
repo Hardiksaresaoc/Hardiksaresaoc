@@ -38,11 +38,17 @@ export class Fundraiser {
     @Column({nullable:true})
     mobile_number:number
 
+    // @Column('text',{array: true,nullable:true})
+    // profilePicture:string[];
+
     @Column({nullable:true})
     address:string
 
     @Column({nullable:true})
     city:string
+
+    @Column({nullable:true})
+    profileImage: string;
 
     @Column({nullable:true})
     state:string

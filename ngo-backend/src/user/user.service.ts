@@ -9,6 +9,21 @@ import { use } from 'passport';
 import { FundRaiserRepository } from '../fundraiser/repo/fundraiser.repository';
 import { Fundraiser } from '../fundraiser/entities/fundraiser.entity';
 import { ChangePasswordDto } from '../fundraiser/dto/change-password.dto';
+import * as path from 'path';
+import { diskStorage } from "multer"
+import {v4 as uuidv4} from "uuid";
+
+export const storage =   {  storage:diskStorage({
+  destination:"./uploads/profileImages",
+  filename:(req,file,cb)=>{
+    const filename:string = path.parse(file.originalname).name.replace(/\s/g, "") + uuidv4();
+    const extension:string = path.parse(file.originalname).ext;
+
+    cb(null, `${filename}${extension}`)
+  } 
+})
+}
+
 
 @Injectable()
 export class UserService {

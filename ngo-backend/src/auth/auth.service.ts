@@ -8,6 +8,7 @@ import { UserRepository } from 'src/user/repo/user.repository';
 import { UserService } from 'src/user/user.service';
 import { ForgottenPasswordRepository } from './repo/forgot-password.repo';
 import { ForgottenPassword } from './entities/forgot-password.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +16,10 @@ export class AuthService {
     constructor(
         private userService: UserService,
         private mailerService: MailerService,
-        private forgottenPasswordRepository:ForgottenPasswordRepository
+        private forgottenPasswordRepository:ForgottenPasswordRepository,
+        private jwtService: JwtService,
+        private configService: ConfigService,
+        private userRepository:UserRepository
     ){}
 
     async sendEmailForgotPassword(email:string){
@@ -53,6 +57,64 @@ export class AuthService {
     }
     
        
+    // async refreshToken(req: Request, res: Response): Promise<string> {
+    //     const refreshToken = req.cookies['refresh_token'];
+    
+    //     if (!refreshToken) {
+    //       throw new UnauthorizedException('Refresh token not found');
+    //     }
+    
+    //     let payload;
+    //     try {
+    //       payload = this.jwtService.verify(refreshToken, {
+    //         secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+    //       });
+    //     } catch (error) {
+    //       throw new UnauthorizedException('Invalid or expired refresh token');
+    //     }
+    
+    //     const userExists = await this.userRepository.findOne({
+    //       where: { id: payload.sub },
+    //     });
+    
+    //     if (!userExists) {
+    //       throw new BadRequestException('User no longer exists');
+    //     }
+    
+    //     const expiresIn = 15000; // seconds
+    //     const expiration = Math.floor(Date.now() / 1000) + expiresIn;
+    //     const accessToken = this.jwtService.sign(
+    //       { ...payload, exp: expiration },
+    //       {
+    //         secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
+    //       },
+    //     );
+    
+    //     res.cookie('access_token', accessToken, { httpOnly: true });
+    
+    //     return accessToken;
+    //   }
+    //   async issueTokens(user: User, response: Response) {
+    //     const payload = { username: user.firstName, sub: user.id ,role:user.role};
+    //     const accessToken = this.jwtService.sign(
+    //       { ...payload },
+    //       {
+    //         secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
+    //         expiresIn: '150sec',
+    //       },
+    //     );
+
+    //     const refreshToken = this.jwtService.sign(payload, {
+    //       secret: this.configService.get<string>('REFRESH_TOKEN_SECRET'),
+    //       expiresIn: '7d',
+    //     });
+
+    //     response.cookie('access_token', accessToken, { httpOnly: true ,maxAge:150000});
+    //     response.cookie('refresh_token', refreshToken, {
+    //       httpOnly: true,
+    //     });
+    //     return { user };
+    //   }
        
      
 }

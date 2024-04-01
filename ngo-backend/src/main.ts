@@ -1,12 +1,15 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { JwtAuthGuard } from './auth/guard/jwt.guard';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as cookieParser from "cookie-parser"
 const cors = require('cors');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalGuards(new JwtAuthGuard());
+  const reflector = app.get(Reflector)
+  // app.use(cookieParser());
+  app.useGlobalGuards(new JwtAuthGuard(reflector));
   const corsOpts = {
     origin: 'http://localhost:3000',
     credentials: true,
@@ -32,7 +35,7 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .setTitle('NGO Website')
-    .setDescription('Ngo Website Nest Rest Api Documentation')
+    .setDescription('Ngo Website Api Documentation')
     .setVersion('1.0')
     .addBearerAuth(
       {

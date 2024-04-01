@@ -10,6 +10,7 @@ import { ProjectService } from 'src/project/project.service';
 
 @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
 @ApiTags("Admin")
+@ApiSecurity("JWT-auth")
 @Controller('admin')
 export class AdminController {
   constructor(private readonly adminService: AdminService,
