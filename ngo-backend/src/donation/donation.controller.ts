@@ -1,11 +1,14 @@
-import { Body, Controller, Param, Post, Req } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Post, Req, ValidationPipe } from '@nestjs/common';
 import { DonationService } from './donation.service';
 import { User } from 'src/user/entities/user.entity';
 import { Fundraiser } from 'src/fundraiser/entities/fundraiser.entity';
 import { Donation } from './entities/donation.entity';
 import { FundraiserService } from 'src/fundraiser/fundraiser.service';
 import { Public } from 'src/public.decorator';
+import { ApiTags } from '@nestjs/swagger';
+import { DonateDto } from './dto/donate.dto';
 
+@ApiTags("Donation")
 @Controller('donation')
 export class DonationController {
   constructor(private readonly donationService: DonationService
@@ -13,14 +16,14 @@ export class DonationController {
 
     @Post("/pay")
     @Public()
-    async donate(@Req()req,@Body()body,@Param("id") id:number){
-      await this.donationService.donate(req,body,id);
+    async donate(@Req()req,@Body(ValidationPipe)body:DonateDto){
+      await this.donationService.donate(req,body);
     }
   
 
   @Post("/pay/:id")
   @Public()
-  async donateToFundRaiser(@Req()req,@Body()body,@Param("id") id:number){
+  async donateToFundRaiser(@Req()req,@Body(ValidationPipe)body:DonateDto,@Param("id",ParseIntPipe) id:number){
     await this.donationService.donate(req,body,id);
   }
 

@@ -10,7 +10,7 @@ import { User } from 'src/user/entities/user.entity';
 @Injectable()
 export class AdminService {
 
-    constructor(private fundRaiserService:FundraiserService,
+    constructor(
         private fundraiserRepository:FundRaiserRepository,
         private userRepository:UserRepository){}
 

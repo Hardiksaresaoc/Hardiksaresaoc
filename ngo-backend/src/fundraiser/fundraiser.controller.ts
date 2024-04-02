@@ -17,6 +17,8 @@ import { of } from 'rxjs';
 import * as path from 'path';
 
 @ApiTags("FundRaiser")
+@ApiSecurity("JWT-auth")
+@UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
 @Controller('fundRaiser')
 export class FundraiserController {
   constructor(private readonly fundraiserService: FundraiserService,
@@ -24,18 +26,15 @@ export class FundraiserController {
     private userRepository:UserRepository
   ) {}
 
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
-  @ApiSecurity("JWT-auth")
+  //change Password Fundraiser
   @Post("/changePassword")
   async changePassword(@Req() req,@Body() changePasswordDto:ChangePasswordDto){
     await this.fundraiserService.changePassword(req,changePasswordDto)
     return "Password Changed Successfully";
   }
 
-  
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
+  //get fundraiser details
   @Get()
-  @ApiSecurity("JWT-auth")
   async getFundraiser(@Req() req){
     const id = req.user;
     try {
@@ -46,21 +45,15 @@ export class FundraiserController {
     }
   }
 
-  @Get(":id")
-  @Public()
-  async getFundraiserById(@Param("id") id:number){
-    return await this.fundRaiserRepository.findOne({where:{fundraiser_id:id}})
-  }
 
+  //update fundraiser details
   @Put("/update")
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
   async updateFundraiser(@Req() req,@Body()body:UpdateFundraiserDto){
     return this.fundraiserService.updateFundRaiserById(req,body)
   }
 
-
+  //upoad fundraiser profileImage
   @Post("upload")
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
   @UseInterceptors(FileInterceptor("file",storage))
   async uploadFile(@UploadedFile() file,@Req() req){
     let user:User = req.user;
@@ -69,8 +62,8 @@ export class FundraiserController {
     return await this.userRepository.update(user.id,{profileImage:file.filename})
   }
 
+  //get fundraiser ProfileImage
   @Get("profile-image/:imagename")
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
   findProfileImage(@Param("imagename") imagename,@Res() res){
     return of(res.sendFile(path.join(process.cwd(), "uploads/profileImages/"+ imagename)));
   }

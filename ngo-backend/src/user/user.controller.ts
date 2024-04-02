@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, Req, UseGuards, UnauthorizedException, BadRequestException, UseInterceptors, UploadedFile, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe, Req, UseGuards, UnauthorizedException, BadRequestException, UseInterceptors, UploadedFile, Res, NotFoundException } from '@nestjs/common';
 import { UserService, storage } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,10 +15,11 @@ import { User } from './entities/user.entity';
 import { UserRepository } from './repo/user.repository';
 import { Fundraiser } from 'src/fundraiser/entities/fundraiser.entity';
 import { Donation } from 'src/donation/entities/donation.entity';
+import { Public } from 'src/public.decorator';
 
 
-@Controller('user')
 @ApiTags("User")
+@Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService,
     private readonly userRepository:UserRepository) {}
@@ -26,6 +27,7 @@ export class UserController {
 
   //signUp Route
   @Post("/signUp")
+  @Public()
   async create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
     const existingUser = await this.userService.findUserByEmail(createUserDto.email);
     if(existingUser){
@@ -36,32 +38,21 @@ export class UserController {
     }
   }
 
-  //Get-all user route NOTE:Only admin-access route
+  //getUserDetails
+  @ApiSecurity("JWT-auth")
   @Get()
-  @ApiSecurity("JWT-auth")
-  @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
-  findAll(@Req()req) {
-    return this.userService.findAll();
+  async getUser(@Req() req){
+    const id = req.user;
+    try {
+      return await this.userRepository.findOneOrFail({where:{email:id.email}});
+
+    } catch (error) {
+      throw new NotFoundException("User not found");
+    }
   }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.userService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
-
-  // Delete user route by id
-  @Delete(':id')
+  
+  //uploadProfilePic
   @ApiSecurity("JWT-auth")
-  @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
-  remove(@Param('id') id: string,@Req() req) {
-    return this.userService.remove(+id);
-  }
-
   @Post("upload")
   @UseInterceptors(FileInterceptor("file",storage))
   async uploadFile(@UploadedFile() file,@Req() req){
@@ -70,9 +61,16 @@ export class UserController {
     // return of({imagePath: file.filename});
   }
 
+  //getProfileImage
+  @ApiSecurity("JWT-auth")
   @Get("profile-image/:imagename")
   findProfileImage(@Param("imagename") imagename,@Res() res){
     return of(res.sendFile(path.join(process.cwd(), "uploads/profileImages/"+ imagename)));
   }
+
+    // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  //   return this.userService.update(+id, updateUserDto);
+  // }
 
 }

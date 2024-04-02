@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Req, UseGuards, ValidationPipe } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { sendEmailDto } from 'src/mailer/mail.interface';
@@ -7,51 +7,52 @@ import { UserRepository } from 'src/user/repo/user.repository';
 import { RoleGuard } from 'src/auth/guard/role.guard';
 import { Constants } from 'src/utils/constants';
 import { ProjectService } from 'src/project/project.service';
+import { UserService } from 'src/user/user.service';
+import { GeneratePasswordDto } from './dto/generate-password.dto';
 
 @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
 @ApiTags("Admin")
 @ApiSecurity("JWT-auth")
 @Controller('admin')
-export class AdminController {
+export class AdminController {  
   constructor(private readonly adminService: AdminService,
     private mailerService:MailerService,
     private userRepository:UserRepository,
-    private projectService:ProjectService
+    private projectService:ProjectService,
+    private userService:UserService
     ) {}
 
-  @ApiSecurity("JWT-auth")
+  //change fundraiser status
   @Post("/fundraiser/status/:id")
-  changeFundraiserStatus(@Param('id') id: number) {
+  changeFundraiserStatus(@Param('id',ParseIntPipe) id: number) {
     return this.adminService.changeFundraiserStatus(id);
   }
-
-  @ApiSecurity("JWT-auth")
+  
+ //delete fundraiser
   @Delete("/fundraiser/delete/:id")
   deleteFundraiser(@Param('id',ParseIntPipe) id: number) {
     return this.adminService.deleteFundraiser(id);
   }
 
-  @ApiSecurity("JWT-auth")
+  //get all fundraiser
   @Get("/fundraiser")
   getAllFundraiser() {
     return this.adminService.getAllFundraiser();
   }
 
-  @ApiSecurity("JWT-auth")
+  //generate password for fundraiser
   @Post("/generate")
- async generatePasswordByEmail(@Body() body){
+ async generatePasswordByEmail(@Body(ValidationPipe) body:GeneratePasswordDto){
   const isUserExists = await this.userRepository.findOne({where:{email: body.email}})
   if(isUserExists && isUserExists.role == "FUNDRAISER"){
     throw new BadRequestException("Email already in use")
   }    
 else{
-
-      var randomstring = Math.random().toString(36).slice(-8);
-      // console.log(randomstring);
-      // console.log(body.email)
+      //generating random password in randomPassword variable
+      var randomPassword = Math.random().toString(36).slice(-8);
       var body2 = {
           "firstName":body.firstName,
-          "password":randomstring
+          "password":randomPassword
       }
       const dto:sendEmailDto = {
           // from: {name:"Lucy", address:"lucy@example.com"},
@@ -62,25 +63,35 @@ else{
         };
         await this.mailerService.sendMail(dto);
           
-      return this.adminService.createdByAdmin(body, randomstring)
+      return this.adminService.createdByAdmin(body, randomPassword)
 }
   }
 
-  @ApiSecurity("JWT-auth")
+  //delete User
   @Delete("/user/delete/:id")
   deleteUser(@Param('id',ParseIntPipe) id: number) {
     return this.adminService.deleteUser(id);
   }
 
+  //get all projects
   @Get("projects")
   getProjects(){
     return this.projectService.getProjects();
   }
 
+  //get project by id
   @Get("project/:id")
-  async getProjectById(@Param("id") project_id:number){
+  async getProjectById(@Param("id",ParseIntPipe) project_id:number){
     return await this.projectService.getProjectById(project_id)
   }
+
+    //Get-all user route
+    @Get("/user")
+    findAll(@Req()req) {
+      return this.userService.findAll();
+    }
+  
+
 
 
 

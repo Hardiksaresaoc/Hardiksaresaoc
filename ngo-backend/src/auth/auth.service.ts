@@ -17,9 +17,6 @@ export class AuthService {
         private userService: UserService,
         private mailerService: MailerService,
         private forgottenPasswordRepository:ForgottenPasswordRepository,
-        private jwtService: JwtService,
-        private configService: ConfigService,
-        private userRepository:UserRepository
     ){}
 
     async sendEmailForgotPassword(email:string){

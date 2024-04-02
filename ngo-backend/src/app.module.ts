@@ -9,6 +9,7 @@ import { DonationModule } from './donation/donation.module';
 import { ProjectModule } from './project/project.module';
 import { AdminModule } from './admin/admin.module';
 import { FundraiserPageModule } from './fundraiser-page/fundraiser-page.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { FundraiserPageModule } from './fundraiser-page/fundraiser-page.module';
   DonationModule,
   AdminModule,
   FundraiserPageModule,
+  ScheduleModule.forRoot()
   ],
     
   controllers: [],
