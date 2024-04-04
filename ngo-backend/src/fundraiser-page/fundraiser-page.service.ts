@@ -1,4 +1,4 @@
-import { Body, Injectable, Req } from '@nestjs/common';
+import { Body, Injectable, NotFoundException, Req } from '@nestjs/common';
 import { Donation } from 'src/donation/entities/donation.entity';
 import { User } from 'src/user/entities/user.entity';
 import { DataSource } from 'typeorm';
@@ -16,34 +16,23 @@ export class FundraiserPageService {
         private fundRaiserRepository:FundRaiserRepository,
         ){}
 
-    async create(req,body,files,id,fundraiser){
-        const fundraiserPage:FundraiserPage = new FundraiserPage();
-        fundraiserPage.target_amount = body.target_amount;
-        // fundraiserPage.raised_amount = 0;
-        fundraiserPage.resolution = body.resolution;
-        // fundraiserPage.about = body.data.about;
-        // fundraiserPage.money_raised_for = body.data.money_raised_for;
+    async update(body,files,PageId){
+        try {
+                    let fundRaiserPageNew = await this.fundRaiserPageRepository.find({where:{id:PageId}})
+        await this.fundRaiserPageRepository.update(PageId,body) 
+        const fundraiserGallery = fundRaiserPageNew[0].gallery
+        for(let i = 0; i <files.length; i++){
+            fundraiserGallery.push(files[i])
+        }
+        // console.log(fundraiserGallery)
 
-        // let supporters = await this.donationRepository.find({where:{fundraiser:{fundraiser_id:fundraiser.fundraiser_id}}},)
-        // console.log(supporters)
-        let supporter = [];
-        let updatedAmount = 0;
-
-        // supporters.forEach(supporters => {
-        //     // const fileReponse = {
-        //     //   filename: file.filename,
-        //     // };
-        //     supporter.push(supporters.Name)
-        //     updatedAmount = updatedAmount + supporters.amount
-        //   });
-        fundraiserPage.raised_amount = updatedAmount;  
-        fundraiserPage.supporters = supporter  
-        fundraiserPage.gallery = files;
-        fundraiserPage.fundraiser = fundraiser;
-        // console.log(fundraiserPage)
-        await this.fundRaiserPageRepository.save(fundraiserPage);
-        return fundraiserPage;
+        await this.fundRaiserPageRepository.update(PageId,{gallery:fundraiserGallery}) 
+    } catch (error) {
+            throw new NotFoundException("Not Found")
     }
+
+    }
+    
 //     async updateRaisedAmount(){
 //         let raised_amount = 0;
 //         const firstUser = await this.dataSource

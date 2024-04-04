@@ -38,9 +38,9 @@ export class AuthController {
         //jwt token
         const user : User = req.user;
         if((user.role=="FUNDRAISER" && await this.fundraiserService.getFundRaiserStatusByEmail(user.email)=="active" ) ||(user.role=="NORMAL_USER_ROLE") || (user.role=="ADMIN")){
-            
+            const userPassword = await this.userRepository.findOne({where: {email: user.email},select:["password"]})    
         
-        if(user && (await bcrypt.compare(loginDto.password,user.password))){
+        if(user && (await bcrypt.compare(loginDto.password,userPassword.password))){
             const payload = {
                 "firstName": user.firstName,
                 "lastName": user.lastName,

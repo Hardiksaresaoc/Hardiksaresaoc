@@ -4,10 +4,12 @@ import { Strategy } from "passport-local";
 import { User } from "src/user/entities/user.entity";
 import { UserService } from "src/user/user.service";
 import * as bcrypt from "bcrypt";
+import { UserRepository } from "src/user/repo/user.repository";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy){
-    constructor(private userService: UserService){
+    constructor(private userService: UserService,
+        private userRepository: UserRepository){
         super({
             usernameField: 'email',
             passwordField: 'password',
@@ -16,17 +18,18 @@ export class LocalStrategy extends PassportStrategy(Strategy){
 
     async validate(email:string, password:string): Promise<User>{
         const user: User = await this.userService.findUserByEmail(email);
-        if(user && (await bcrypt.compare(password,user.password))){
+        const userPassword = await this.userRepository.findOne({where: {email: email},select:["password"]})
+        if(user && (await bcrypt.compare(password,userPassword.password))){
             return user;
         }
+        if(user == undefined){
+            throw new UnauthorizedException("User not found:"+ email
+            );
+        }
+        if(!(await bcrypt.compare(password,userPassword.password))){
+            throw new UnauthorizedException("Invalid password"
+            );
+        }
         return null;
-        // if(user == undefined){
-        //     throw new UnauthorizedException("User not found:"+ email
-        //     );
-        // }
-        // if(user.password != password){
-        //     throw new UnauthorizedException("Invalid password"
-        //     );
-        // }
     }
 }

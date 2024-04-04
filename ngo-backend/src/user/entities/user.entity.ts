@@ -1,4 +1,5 @@
 import { Field } from "@nestjs/graphql";
+import { Exclude } from "class-transformer";
 import { Donation } from "src/donation/entities/donation.entity";
 import { Fundraiser } from "src/fundraiser/entities/fundraiser.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
@@ -20,7 +21,7 @@ export class User {
     @Column({unique:true})
     email: string;
 
-    @Column()
+    @Column({select:false})
     password: string;
 
     @Column()

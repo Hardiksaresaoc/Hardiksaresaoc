@@ -5,6 +5,7 @@ import { User } from "src/user/entities/user.entity";
 import { Project } from "src/project/entities/project.entity";
 import { IsNumber } from "class-validator";
 import { FundraiserPage } from "src/fundraiser-page/entities/fundraiser-page.entity";
+import { Exclude } from "class-transformer";
 
 @Entity()
 export class Fundraiser {
@@ -24,7 +25,7 @@ export class Fundraiser {
     @Column({unique:true})
     email: string;
 
-    @Column()
+    @Column({select:false})
     password: string;
 
     @Column()
@@ -87,7 +88,7 @@ export class Fundraiser {
     @OneToMany(()=>Project,project=>project.fundraiser)
     project:Project[]
 
-    @OneToOne(()=>FundraiserPage,fundraiserPage=>fundraiserPage.fundraiser)
-    fundraiser_page:FundraiserPage;
+    @OneToMany(()=>FundraiserPage,fundraiserPage=>fundraiserPage.fundraiser)
+    fundraiser_page:FundraiserPage[];
 
 }

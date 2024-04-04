@@ -1,13 +1,10 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, Put, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, Put, Req, Res, UploadedFile, UseGuards, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { FundraiserService } from './fundraiser.service';
 import { RoleGuard } from 'src/auth/guard/role.guard';
 import { Constants } from 'src/utils/constants';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { FundRaiserRepository } from './repo/fundraiser.repository';
-import { Public } from 'src/public.decorator';
-import { Fundraiser } from './entities/fundraiser.entity';
 import { UpdateFundraiserDto } from './dto/update-profile.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storage } from 'src/user/user.service';
@@ -48,7 +45,7 @@ export class FundraiserController {
 
   //update fundraiser details
   @Put("/update")
-  async updateFundraiser(@Req() req,@Body()body:UpdateFundraiserDto){
+  async updateFundraiser(@Req() req,@Body(ValidationPipe)body:UpdateFundraiserDto){
     return this.fundraiserService.updateFundRaiserById(req,body)
   }
 
