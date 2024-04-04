@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FundraiserPageService } from './fundraiser-page.service';
 import { FundraiserService } from 'src/fundraiser/fundraiser.service';
 import { Public } from 'src/public.decorator';
@@ -78,7 +78,15 @@ return await this.fundraiserPageService.update(filteredBody,response,id)
     @Get(":id")
     @Public()
     async getFundraiserById(@Param("id",ParseIntPipe) id:number){
-      return await this.fundraiserPageRepository.findOne({where:{id:id}})
+      try {
+        const fundraiserPage = await this.fundraiserPageRepository.findOne({where:{id:id}});
+        if (!fundraiserPage) {
+          throw new NotFoundException('Fundraiser not found');
+        }
+        return fundraiserPage;
+      } catch (error) {
+        throw new NotFoundException("Fundraiser Page not found")
+      }
     }
   
 }

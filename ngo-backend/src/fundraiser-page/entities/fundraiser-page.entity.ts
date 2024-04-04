@@ -34,7 +34,7 @@ export class FundraiserPage{
     @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
     public updated_at: Date;
 
-    @ManyToOne(()=>Fundraiser,fundraiser=>fundraiser.fundraiser_page,{onDelete:"CASCADE"})
+    @ManyToOne(()=>Fundraiser,fundraiser=>fundraiser.fundraiser_page,{onDelete:"CASCADE",eager:true})
     fundraiser:Fundraiser;
 
 }

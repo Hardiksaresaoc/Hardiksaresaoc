@@ -43,11 +43,12 @@ export class AuthController {
         if(user && (await bcrypt.compare(loginDto.password,userPassword.password))){
             const payload = {
                 "firstName": user.firstName,
-                "lastName": user.lastName,
                 "email": user.email,
                 "role": user.role,
-                "userId": user.id   
+                "userId": user.id,
+                "profileImage":user.profileImage   
             }
+            console.log(payload)
             return {token: this.jwtService.sign(payload)};   
             // return this.authService.issueTokens(user, response); // Issue tokens on login
  

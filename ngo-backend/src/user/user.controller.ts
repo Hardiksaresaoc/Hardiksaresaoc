@@ -57,6 +57,7 @@ export class UserController {
   @UseInterceptors(FileInterceptor("file",storage))
   async uploadFile(@UploadedFile() file,@Req() req){
     let user:User = req.user;
+    console.log(user)
     return await this.userRepository.update(user.id,{profileImage:file.filename})
     // return of({imagePath: file.filename});
   }

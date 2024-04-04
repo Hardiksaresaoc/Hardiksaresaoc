@@ -9,7 +9,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { DonateDto } from './dto/donate.dto';
 
 @ApiTags("Donation")
-@Controller('donation')
+@Controller()
 export class DonationController {
   constructor(private readonly donationService: DonationService
     ) {}
@@ -21,7 +21,7 @@ export class DonationController {
     }
   
 
-  @Post("/pay/:id")
+  @Post("/fundraiser-page/:id/donate")
   @Public()
   async donateToFundRaiser(@Req()req,@Body(ValidationPipe)body:DonateDto,@Param("id",ParseIntPipe) id:number){
     await this.donationService.donate(req,body,id);
