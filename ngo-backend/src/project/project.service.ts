@@ -20,4 +20,18 @@ export class ProjectService {
         }
     }
 
+    async getProjectByName(project_name){
+        try {
+            const project =  await this.projectRepository.findOne({where:{project_name:project_name}})
+            if(project){
+                return project;
+            }
+            else{
+                throw new NotFoundException('Project not found');
+            }
+        } catch (error) {
+            return "Project not found";
+        }
+    }
+
 }

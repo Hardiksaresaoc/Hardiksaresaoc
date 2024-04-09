@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { DonationService } from './donation.service';
 import { DonationController } from './donation.controller';
 import { Donation } from './entities/donation.entity';
@@ -8,7 +8,7 @@ import { FundraiserModule } from 'src/fundraiser/fundraiser.module';
 import { FundraiserPageModule } from 'src/fundraiser-page/fundraiser-page.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Donation]),FundraiserModule,FundraiserPageModule],
+  imports:[TypeOrmModule.forFeature([Donation]),forwardRef(() =>FundraiserModule),FundraiserPageModule],
   controllers: [DonationController],
   providers: [DonationService,DonationRepository],
   exports:[DonationRepository]

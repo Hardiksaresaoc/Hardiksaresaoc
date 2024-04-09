@@ -1,5 +1,5 @@
 import { Field } from "@nestjs/graphql";
-import { Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { Donation } from "../../donation/entities/donation.entity";
 import { User } from "src/user/entities/user.entity";
 import { Project } from "src/project/entities/project.entity";
@@ -85,7 +85,8 @@ export class Fundraiser {
     @OneToMany(()=>Donation,donation=>donation.fundraiser)
     donations:Donation[];
 
-    @OneToMany(()=>Project,project=>project.fundraiser)
+    @ManyToMany(()=>Project,project=>project.fundraiser)
+    @JoinTable()
     project:Project[]
 
     @OneToMany(()=>FundraiserPage,fundraiserPage=>fundraiserPage.fundraiser)

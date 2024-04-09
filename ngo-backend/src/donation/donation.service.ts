@@ -24,10 +24,12 @@ export class DonationService {
                 donation.Name = firstName;
                 supporters.push(firstName)
             }
+            else{
 
             donation.Name = firstName + " " + lastName;
             donation.user = user;
             supporters.push(firstName + " " + lastName)
+            }
         }
         else{
             donation.Name = body.name;
@@ -37,6 +39,11 @@ export class DonationService {
         try{
             if(id){
             let fundraiserPage = await this.fundRaiserPageRepository.findOne({where:{id:id}})
+            let supportersOfFundraiser = fundraiserPage.supporters
+            for(let i = 0; i <supporters.length; i++){
+                supportersOfFundraiser.push(supporters[i])
+            }
+    
             if(!fundraiserPage){
                 throw new NotFoundException("Fundraiser Page not found");
             }
@@ -46,7 +53,7 @@ export class DonationService {
             await this.fundRaiserRepository.update(fundraiser.fundraiser_id,{total_amount_raised:total_amount_raised,
             total_donations:total_donations})
             const newAmount:number = fundraiserPage.raised_amount + parseInt(body.amount);
-            await this.fundRaiserPageRepository.update(id,{ raised_amount:newAmount,supporters:supporters})
+            await this.fundRaiserPageRepository.update(id,{ raised_amount:newAmount,supporters:supportersOfFundraiser})
 
 
             if(fundraiser.status == "active"){
@@ -58,7 +65,7 @@ export class DonationService {
         donation.amount = body.amount;
 
         
-        // return this.donationRepository.save(donation);
+        return this.donationRepository.save(donation);
     }
       }
     

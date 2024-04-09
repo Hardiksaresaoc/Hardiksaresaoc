@@ -14,7 +14,7 @@ export class DonationController {
   constructor(private readonly donationService: DonationService
     ) {}
 
-    @Post("/pay")
+    @Post("/donate")
     @Public()
     async donate(@Req()req,@Body(ValidationPipe)body:DonateDto){
       await this.donationService.donate(req,body);

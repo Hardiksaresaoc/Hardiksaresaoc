@@ -1,5 +1,6 @@
 import { Fundraiser } from "src/fundraiser/entities/fundraiser.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Project } from "src/project/entities/project.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 
@@ -36,5 +37,8 @@ export class FundraiserPage{
 
     @ManyToOne(()=>Fundraiser,fundraiser=>fundraiser.fundraiser_page,{onDelete:"CASCADE",eager:true})
     fundraiser:Fundraiser;
+
+    @ManyToOne(()=>Project,project=>project.fundraiserPage,{onDelete:"SET NULL"})
+    project:Project;
 
 }

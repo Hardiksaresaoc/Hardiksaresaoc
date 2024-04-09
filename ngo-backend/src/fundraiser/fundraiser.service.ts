@@ -6,11 +6,17 @@ import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/repo/user.repository';
 import { User } from 'src/user/entities/user.entity';
 import { UpdateFundraiserDto } from './dto/update-profile.dto';
+import { time } from 'console';
+import { FundraiserPageRepository } from 'src/fundraiser-page/repo/fundraiser-page.repository';
+import { DonationRepository } from 'src/donation/repo/donation.repository';
 
 @Injectable()
 export class FundraiserService {
 
-    constructor(private fundRaiserRepository:FundRaiserRepository,private userRepository:UserRepository){}
+    constructor(private fundRaiserRepository:FundRaiserRepository,
+      private userRepository:UserRepository,
+      private fundraiserPageRepository:FundraiserPageRepository,
+      private donationRepository:DonationRepository){}
     
     findFundRaiserByEmail(email: string) {
         return this.fundRaiserRepository.findOne({where: {email: email}});
@@ -59,6 +65,15 @@ export class FundraiserService {
       // console.log(updatedFund)
 
     }  
+
+    async getAllFundraiserPages(fundraiser){
+      return await this.fundraiserPageRepository.find({where:{fundraiser:{fundraiser_id:fundraiser.fundraiser_id}}})
+    }
     
+    async getDonationByIdFundraiser(user){
+      const fundRaiser = await this.findFundRaiserByEmail(user.email)
+      const donation = await this.donationRepository.find({where:{fundraiser:{fundraiser_id:fundRaiser.fundraiser_id}}})
+      return donation;
+    }
     
 }

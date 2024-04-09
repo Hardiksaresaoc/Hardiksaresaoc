@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, Put, Req, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FundraiserPageService } from './fundraiser-page.service';
 import { FundraiserService } from 'src/fundraiser/fundraiser.service';
 import { Public } from 'src/public.decorator';
@@ -13,6 +13,7 @@ import { RoleGuard } from 'src/auth/guard/role.guard';
 import { Constants } from 'src/utils/constants';
 import { FundraiserPage } from './entities/fundraiser-page.entity';
 import { UpdateFundraiserPageDto } from './dto/update-fundraiser-page.dto';
+import { OwnershipGuard } from './guard/ownership.guard';
 
 @ApiTags("Fundraiser-Page")
 @Controller('fundraiser-page')
@@ -30,18 +31,22 @@ export class FundraiserPageController {
     let user:User = req.user;
     let fundRaiser = await this.fundraiserService.findFundRaiserByEmail(user.email)
     const fundraiserPage:FundraiserPage = new FundraiserPage();
+    fundraiserPage.supporters = []
+    fundraiserPage.gallery = []
     fundraiserPage.fundraiser = fundRaiser;
     await this.fundraiserPageRepository.save(fundraiserPage);
     return fundraiserPage;
   }
 
   @ApiSecurity("JWT-auth")
-  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE))
-  @Post("updatePage/:id")
+  @UseGuards(new RoleGuard(Constants.ROLES.FUNDRAISER_ROLE),OwnershipGuard)
+  @Put("/:id/updatePage")
   @UseInterceptors(FilesInterceptor("file",20,storage))
   async updatePage(@UploadedFiles() files,@Req() req,@Body() body,@Param("id")id:number){
     let user:User = req.user;
     body = JSON.parse(body.data)
+
+    const project_name = body.project_name
     const dtoInstance = new UpdateFundraiserPageDto(body);
     const dtoKeys = Object.keys(dtoInstance);
     // console.log(dtoKeys)
@@ -56,7 +61,6 @@ export class FundraiserPageController {
       }, {});
   
     // console.log(filteredBody)
-    let fundRaiser = await this.fundraiserService.findFundRaiserByEmail(user.email)
     const response = [];
     try {
       files.forEach(file => {
@@ -70,7 +74,7 @@ export class FundraiserPageController {
     } catch (error) {
       return true;
     }
-return await this.fundraiserPageService.update(filteredBody,response,id)
+return await this.fundraiserPageService.update(filteredBody,response,id,project_name,user)
   }
 
 

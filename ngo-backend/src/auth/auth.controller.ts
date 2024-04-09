@@ -48,7 +48,6 @@ export class AuthController {
                 "userId": user.id,
                 "profileImage":user.profileImage   
             }
-            console.log(payload)
             return {token: this.jwtService.sign(payload)};   
             // return this.authService.issueTokens(user, response); // Issue tokens on login
  

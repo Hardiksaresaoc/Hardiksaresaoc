@@ -12,6 +12,7 @@ import { User } from 'src/user/entities/user.entity';
 import { UserRepository } from 'src/user/repo/user.repository';
 import { of } from 'rxjs';
 import * as path from 'path';
+import { Fundraiser } from './entities/fundraiser.entity';
 
 @ApiTags("FundRaiser")
 @ApiSecurity("JWT-auth")
@@ -49,7 +50,13 @@ export class FundraiserController {
     return this.fundraiserService.updateFundRaiserById(req,body)
   }
 
-  //upoad fundraiser profileImage
+  @Get("/fundraiser-page")
+  async getAllFundraiserPages(@Req() req){
+    let fundRaiser:Fundraiser = await this.fundRaiserRepository.findOne({where:{fundraiser_id:req.id}})
+    return this.fundraiserService.getAllFundraiserPages(fundRaiser);
+  }
+
+  //upload fundraiser profileImage
   @Post("upload")
   @UseInterceptors(FileInterceptor("file",storage))
   async uploadFile(@UploadedFile() file,@Req() req){
@@ -66,4 +73,10 @@ export class FundraiserController {
   }
 
 
+
+  @Get("/donations")
+  async getDonationsById(@Req() req){
+    let user:User = req.user;
+    return await this.fundraiserService.getDonationByIdFundraiser(user)
+  }
 }

@@ -7,6 +7,9 @@ import { FundraiserPageRepository } from './repo/fundraiser-page.repository';
 import { Fundraiser } from 'src/fundraiser/entities/fundraiser.entity';
 import { FundRaiserRepository } from 'src/fundraiser/repo/fundraiser.repository';
 import { DonationRepository } from 'src/donation/repo/donation.repository';
+import { ProjectService } from 'src/project/project.service';
+import { Project } from 'src/project/entities/project.entity';
+import { ProjectRepository } from 'src/project/repo/project.repository';
 
 @Injectable()
 export class FundraiserPageService {
@@ -14,21 +17,39 @@ export class FundraiserPageService {
     constructor(private dataSource:DataSource,
         private fundRaiserPageRepository:FundraiserPageRepository,
         private fundRaiserRepository:FundRaiserRepository,
+        private projectRepository:ProjectRepository
         ){}
 
-    async update(body,files,PageId){
+    async update(body,files,PageId,project_name,user){
         try {
-                    let fundRaiserPageNew = await this.fundRaiserPageRepository.find({where:{id:PageId}})
+
+        //finding fundraiserPage using id from parmameters and updating data using body data 
+        let fundRaiserPageNew = await this.fundRaiserPageRepository.find({where:{id:PageId}})
         await this.fundRaiserPageRepository.update(PageId,body) 
+
+        //accessing existing galley of fundraiserPage and pushing new uploaded files
         const fundraiserGallery = fundRaiserPageNew[0].gallery
         for(let i = 0; i <files.length; i++){
             fundraiserGallery.push(files[i])
         }
-        // console.log(fundraiserGallery)
 
-        await this.fundRaiserPageRepository.update(PageId,{gallery:fundraiserGallery}) 
+        //finding Project using project_name from body to update project id in fundraiser page
+        const project:Project= await this.projectRepository.findOne({where:{project_name:project_name}})
+        let fundraiser:Fundraiser = await this.fundRaiserRepository.findOne({where:{email:user.email}})
+        
+        //accessing existing fundraiser in project and pushing new fundraiser 
+        let fundRaiser = project.fundraiser
+        fundRaiser.push(fundraiser)
+        project.fundraiser = fundRaiser
+        
+        //saving new fundraiser in project
+        const temp = await this.projectRepository.save(project)
+
+        //saving new data of fundraiserPage with gallery and project
+        await this.fundRaiserPageRepository.update(PageId,{gallery:fundraiserGallery,project:project}) 
     } catch (error) {
-            throw new NotFoundException("Not Found")
+        console.log(error)
+        throw new NotFoundException("Not Found")
     }
 
     }

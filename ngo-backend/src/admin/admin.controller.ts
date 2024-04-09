@@ -9,6 +9,9 @@ import { Constants } from 'src/utils/constants';
 import { ProjectService } from 'src/project/project.service';
 import { UserService } from 'src/user/user.service';
 import { GeneratePasswordDto } from './dto/generate-password.dto';
+import { FundraiserService } from 'src/fundraiser/fundraiser.service';
+import { AddOfflineDonationDto } from './dto/offline-donation.dto';
+import { FundRaiserRepository } from 'src/fundraiser/repo/fundraiser.repository';
 
 @UseGuards(new RoleGuard(Constants.ROLES.ADMIN_ROLE))
 @ApiTags("Admin")
@@ -19,7 +22,8 @@ export class AdminController {
     private mailerService:MailerService,
     private userRepository:UserRepository,
     private projectService:ProjectService,
-    private userService:UserService
+    private userService:UserService,
+    private fundraiserRepository:FundRaiserRepository
     ) {}
 
   //change fundraiser status
@@ -92,6 +96,17 @@ else{
     }
   
 
+    @Post("/addOfflineDonation")
+    async addOfflineDonation(@Req() req, @Body() body:AddOfflineDonationDto){
+      if(await this.fundraiserRepository.findOne({where:{fundraiser_id:body.fundraiser_id}})){
+        return await this.adminService.addOfflineDonation(body)
+      }
+      else{
+        return "Fundraiser Not Found  "
+      }
+
+      
+    }
 
 
 

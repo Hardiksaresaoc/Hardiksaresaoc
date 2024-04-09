@@ -1,7 +1,8 @@
 import { Field } from "@nestjs/graphql";
 import { Donation } from "src/donation/entities/donation.entity";
+import { FundraiserPage } from "src/fundraiser-page/entities/fundraiser-page.entity";
 import { Fundraiser } from "src/fundraiser/entities/fundraiser.entity";
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Project {
@@ -18,7 +19,7 @@ export class Project {
     @Column('text',{array: true})
     project_images: string[];
 
-    @Column()
+    @Column({default:0})
     total_donations:number;
 
     @CreateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)" })
@@ -27,8 +28,11 @@ export class Project {
     @UpdateDateColumn({ type: "timestamp", default: () => "CURRENT_TIMESTAMP(6)", onUpdate: "CURRENT_TIMESTAMP(6)" })
     public updated_at: Date;
 
-    @ManyToOne(()=>Fundraiser,fundraiser=>fundraiser.project,{onDelete:"SET NULL"})
-    fundraiser:Fundraiser;
+    @ManyToMany(()=>Fundraiser,fundraiser=>fundraiser.project,{onDelete:"SET NULL",eager:true})
+    fundraiser:Fundraiser[];
+
+    @OneToMany(()=>FundraiserPage,fundraiserPage=>fundraiserPage.project,{onDelete:"SET NULL"})
+    fundraiserPage:FundraiserPage[];
 
     @OneToMany(()=>Donation,donation=>donation.project,{onDelete:"SET NULL"})
     donations:Donation[];
