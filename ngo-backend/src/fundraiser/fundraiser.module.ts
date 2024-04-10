@@ -9,7 +9,7 @@ import { FundraiserPageModule } from 'src/fundraiser-page/fundraiser-page.module
 import { DonationModule } from 'src/donation/donation.module';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Fundraiser]),UserModule,forwardRef(() =>FundraiserPageModule),forwardRef(() =>DonationModule)],
+  imports:[TypeOrmModule.forFeature([Fundraiser]),forwardRef(() =>UserModule),forwardRef(() =>FundraiserPageModule),forwardRef(() =>DonationModule)],
   controllers: [FundraiserController],
   providers: [FundraiserService,FundRaiserRepository],
   exports:[FundraiserService,FundRaiserRepository],

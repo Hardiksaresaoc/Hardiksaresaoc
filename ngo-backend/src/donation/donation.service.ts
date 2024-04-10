@@ -15,9 +15,16 @@ export class DonationService {
         private readonly fundRaiserPageRepository:FundraiserPageRepository){}
 
     async donate(req,body,id?){
+        //getting logged user if any
         let user:User = req.user;
+
+        //making a new donation object to save
         let donation:Donation = new Donation();
+
+        //creating empty supporter array to push to supporters of fundraiserPage
         let supporters = []
+
+        //checking if user exists then use name from database [validation also exists for undefined last name]
         if(user){
             const {firstName,lastName} = user;
             if(lastName==undefined){
@@ -36,9 +43,12 @@ export class DonationService {
             supporters.push(body.name)
         }
 
+        //getting fundraiserPage using id from params if any
         try{
             if(id){
             let fundraiserPage = await this.fundRaiserPageRepository.findOne({where:{id:id}})
+            
+            //getting existing fundraiserPage supporters anf pushing new supporters
             let supportersOfFundraiser = fundraiserPage.supporters
             for(let i = 0; i <supporters.length; i++){
                 supportersOfFundraiser.push(supporters[i])
@@ -47,20 +57,28 @@ export class DonationService {
             if(!fundraiserPage){
                 throw new NotFoundException("Fundraiser Page not found");
             }
+            
+            //getting fundraiser to update its dashboard content
             let fundraiser:Fundraiser = await this.fundRaiserRepository.findOne({where:{fundraiser_id:fundraiserPage.fundraiser.fundraiser_id}})
             const total_amount_raised = fundraiser.total_amount_raised + parseInt(body.amount);
             const total_donations = fundraiser.total_donations + 1;
             await this.fundRaiserRepository.update(fundraiser.fundraiser_id,{total_amount_raised:total_amount_raised,
             total_donations:total_donations})
+
+            //getting already raised amount of FundraiserPage and updating amount with supporters
             const newAmount:number = fundraiserPage.raised_amount + parseInt(body.amount);
             await this.fundRaiserPageRepository.update(id,{ raised_amount:newAmount,supporters:supportersOfFundraiser})
 
-
+            //checking if status is active then only fundraiser data is available in donation database
             if(fundraiser.status == "active"){
                 donation.fundraiser = fundraiser;
               }
             }
         }
+        //executing a finally block so that no matter what amount saves with name in database
+        //[whether user is logged in or not]
+        //[whether fundraiser is active or not]
+        //[whether fundraiser id is passed or not]
         finally{
         donation.amount = body.amount;
 

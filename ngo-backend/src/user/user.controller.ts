@@ -69,6 +69,13 @@ export class UserController {
     return of(res.sendFile(path.join(process.cwd(), "uploads/profileImages/"+ imagename)));
   }
 
+  @Get("/donations")
+  async getDonationsById(@Req() req){
+    let user:User = req.user;
+    return await this.userService.getDonationByIdFundraiser(user)
+  }
+
+
     // @Patch(':id')
   // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
   //   return this.userService.update(+id, updateUserDto);

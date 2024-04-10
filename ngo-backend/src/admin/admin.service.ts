@@ -82,6 +82,8 @@ export class AdminService {
     }
 
     async addOfflineDonation(body){
+
+      //same code from donate service here admin passes data in body
       let donation:Donation = new Donation();
       let fundraiserPage = await this.fundraiserPageRepository.findOne({where:{id:body.fundraiserPage_id}})
       let supportersOfFundraiser = fundraiserPage.supporters

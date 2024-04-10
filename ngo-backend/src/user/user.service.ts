@@ -12,6 +12,7 @@ import { ChangePasswordDto } from '../fundraiser/dto/change-password.dto';
 import * as path from 'path';
 import { diskStorage } from "multer"
 import {v4 as uuidv4} from "uuid";
+import { DonationRepository } from 'src/donation/repo/donation.repository';
 
 export const storage =   {  storage:diskStorage({
   destination:"./uploads/profileImages",
@@ -28,7 +29,8 @@ export const storage =   {  storage:diskStorage({
 @Injectable()
 export class UserService {
 
-  constructor(private userRepository: UserRepository){}
+  constructor(private userRepository: UserRepository,
+    private readonly donationRepository:DonationRepository){}
 
 
   async create(createUserDto: CreateUserDto) {
@@ -75,5 +77,10 @@ export class UserService {
     return this.userRepository.delete(id);
   }
 
+  async getDonationByIdFundraiser(user){
+    const donation = await this.donationRepository.find({where:{user:{id:user.id}}})
+    return donation;
+
+  }
 
 }
